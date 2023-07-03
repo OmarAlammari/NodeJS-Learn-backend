@@ -2,6 +2,17 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const Ajv = require('ajv');
+const helmet = require('helmet');
+const ejs = require('ejs');
+
+
+const cookieParser = require('cookie-parser');
+
+app.use(cookieParser());
+
+//3rd party middleware
+app.use(helmet())
+
 
 const schema = {
     "type": "object",
@@ -43,16 +54,27 @@ const schema1 = {
 // let ajv = new Ajv.default({ allErrors: true });
 // var ajv = new Ajv({ allErrors: true });
 // var ajv = new Ajv().compile(schema);    
-
 // let validator =  ajv;
-let validator =  new Ajv.default().compile(schema);
 // let validator =  ajv.compile(schema);
+let validator = new Ajv.default().compile(schema);
+
+// built-in Middleware
+app.use(express.urlencoded({ extended: false })); // Parse URL encoded payload
+
+app.use(express.json());//Parse JSON sent body by clint throught request body
+
+app.use(express.static("public"));// Static files (css,js,img,html...)
+// app.use(express.static("/assets","public"));
 
 
-app.use(express.urlencoded({ extended: false }));
 
-app.use(express.json());
+//custom Middleware (Application Middleware)
+//logging
+app.use((req, res, nxt) => {
 
+
+    nxt();
+});
 const port = process.env.PORT || 3000;
 
 var Students = [
@@ -61,33 +83,73 @@ var Students = [
     { name: 'amran', dept: 'SA', id: 3 },
 ];
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '/main.html'));
+app.get('*', (req, res, nxt) => {
+    console.log("get request recieved...");
+    nxt();
+});
+
+// Route Handler Middleware
+app.get('/',
+    (req, res, next) => {
+        //
+        //
+        next();
+    },
+    (req, res, next) => {
+        //
+        //
+        console.log("stage #1");
+        next();
+    },
+    (req, res) => {
+        res.sendFile(path.join(__dirname, '/main.html'));
+    });
+
+//parameter middleware    
+app.param('id', (req, res, nxt, id) => {
+
+    //validation of parameter
+    if (Number(id)) {
+
+        //add param as prop for req
+        req.id = id;
+
+        nxt();
+    }
+    else {
+        res.send('invalid id');
+    }
 });
 
 //passing data from clint to server via URL parameters
 app.get('/api/students/:id', (req, res) => {
-    let id = req.params.id;
+    // let id = req.params.id;
+    // console.log(req.id);
+    // console.log(req.params.id);
+    let id = req.id;
     const std = Students.find((val, idx, arr) => { return val.id == id });
     if (std) {
         res.json(std);
     } else {
         res.send('not found');
     }
-
 });
 
+app.all('/api/students', (req, res, nxt) => {
+    console.log("request recieved on students Collection...");
+    nxt();
+});
+
+//app settings
+app.set("template engine", "ejs");
+// app.set("views", "templates");
+
+//REquest all Students
 app.get('/api/students', (req, res) => {
-    // let id = req.params.id;
 
-    res.json(Students);
-    // const std = Students.find((val, idx, arr) => { return val.id == id });
-    // if (std) {
-    //     res.json(std);
-    // } else {
-    //     res.send('not found');
-    // }
-
+    res.set("Access-Control-Allow-Origin");
+    // res.json(Students);
+    res.render("Students.ejs", { std: Students });
 });
 
 //Query String
@@ -99,8 +161,17 @@ app.get('/welcome.html', (req, res) => {
     res.sendFile(path.join(__dirname, '/welcome.html'));
 });
 
+//REQ body
 app.post('/welcome.html', (req, res) => {
     console.log(req.body);
+
+    // res.cookie("username", req.body.fnm);
+    // res.cookie("user_age", 22);
+
+    // with Encoded
+    res.cookie("username", Buffer.from(req.body.fnm).toString('base64'));
+    res.cookie("user_age", 22, { httpOnly: true });
+
     res.send(`thanks ${req.body.fnm} ${req.body.lnm} for sending required data`)
 });
 
@@ -148,7 +219,12 @@ app.put('/api/students/:id', (req, res) => {
     }
 });
 
+app.get('/abc', (req, res) => {
+    console.log(Buffer.from(req.cookies.username, 'base64').toString());
+    console.log(req.cookies.age);
 
+    res.sendStatus(200);
+});
 
 
 app.listen(port, () => console.log('true'));
