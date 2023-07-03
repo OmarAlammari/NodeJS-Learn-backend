@@ -1,0 +1,16 @@
+invoke-WebRequest -uri ... -method ...
+    invoke-WebRequest -uri http://localhost:3000/ -method GET
+    invoke-WebRequest -uri http://localhost:3000/ -method POST
+
+Invoke-RestMethod -uri ... -method ...
+     Invoke-RestMethod -uri http://localhost:3000/api/students -method GET
+
+
+ Invoke-RestMethod -uri ... -method ... -body @...
+    Invoke-RestMethod -uri http://localhost:3000/welcome.html -method POST
+     -body @{fnm="omar";lnm="ali"}
+
+ Invoke-WebRequest -uri ... -method ... -body @...
+    Invoke-WebRequest -uri http://localhost:3000/welcome.html -method POST
+     -body @{fnm="omar";lnm="ali"}
+
