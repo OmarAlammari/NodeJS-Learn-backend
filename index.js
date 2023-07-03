@@ -1,52 +1,6 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const Ajv = require('ajv');
-
-const schema = {
-    "type": "object",
-    "properties": {
-        "name": {
-            "type": "string",
-            "pattern": "^[A-Z][a-z]*$"
-        },
-        "dept": {
-            "type": "string",
-            "enum": ["SD", "SA", "MD"],
-            "maxLength": 2,
-            "minLength": 2
-        },
-    },
-    "required": ["name", "dept"],
-    "maxProperties": 2
-};
-const schema1 = {
-    type: "object",
-    properties: {
-        name: {
-            "type": "string",
-            "pattern": "^[A-Z][a-z]*$"
-        },
-        dept: {
-            "type": "string",
-            "enum": ["SD", "SA", "MD"],
-            "maxLength": 2,
-            "minLength": 2
-        },
-    },
-    required: ["name", "dept"],
-    maxProperties: 2
-
-    // additionalProperties: false
-};
-// let ajv = new Ajv();
-// let ajv = new Ajv.default({ allErrors: true });
-// var ajv = new Ajv({ allErrors: true });
-// var ajv = new Ajv().compile(schema);    
-
-// let validator =  ajv;
-let validator =  new Ajv.default().compile(schema);
-// let validator =  ajv.compile(schema);
 
 
 app.use(express.urlencoded({ extended: false }));
@@ -107,20 +61,10 @@ app.post('/welcome.html', (req, res) => {
 // create new students
 app.post('/api/students', (req, res) => {
     let valid = validator(req.body);
-    // console.log(schema);
-    console.log(valid);
-    // req.body.id = Students.length + 1;
-    // Students.push(req.body);
-    // res.json(req.body);
-    if (valid) {
-        req.body.id = Students.length + 1;
-        Students.push(req.body);
-        res.json(req.body);
-    }
-    else {
-        res.status(403).send('forbidden command');
-        // res.sendStatus(403);
-    }
+    req.body.id = Students.length + 1;
+    Students.push(req.body);
+    res.json(req.body);
+    
 });
 
 // delete existing student
