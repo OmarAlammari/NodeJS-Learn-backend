@@ -5,7 +5,6 @@ const Ajv = require('ajv');
 const helmet = require('helmet');
 const ejs = require('ejs');
 
-
 const cookieParser = require('cookie-parser');
 
 app.use(cookieParser());
