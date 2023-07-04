@@ -9,7 +9,6 @@ const getAllStudents = (req, res) => {
         console.log(obj);
         res.render("Students.ejs", { std: obj });
     });
-
     // res.json(new Student().fetchAllStudents() );
     // const li = Student.fetchAllStudents();
     // res.json(li);
