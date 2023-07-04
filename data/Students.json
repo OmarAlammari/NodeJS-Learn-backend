@@ -1,0 +1,22 @@
+[
+    {
+        "name": "ali",
+        "dept": "PD",
+        "id": 1
+    },
+    {
+        "name": "omar",
+        "dept": "SD",
+        "id": 2
+    },
+    {
+        "name": "amran",
+        "dept": "SA",
+        "id": 3
+    },
+    {
+        "name": "Omarr",
+        "dept": "SA",
+        "id": 4
+    }
+]
